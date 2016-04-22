@@ -1,5 +1,5 @@
 <?php
-	$charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	$charset = "ABCDEFGHIJKLMNOPRSTUWY";
 	$vowelset = "AIUEO";
 	$wordset = "";
 	$secret = "tNugBZkSGXttChnKX11hiULGFyhAZtBf";
@@ -27,11 +27,12 @@
 		}
 		echo "[PASS] is not previously guessed <br>";
 		
-		echo "[PREV] " . implode(", ", $guessedwords);
+		echo "[PREV] " . implode(", ", $guessedwords) ."<br>";
 		
-		if(strpos($wordset[0], $word) !== false)
+		if(strpos($wordset[0], $word) === false)
 			return false;
-		echo "<br>[PASS] contains base letter <br>";
+
+		echo "[PASS] contains base letter <br>";
 		
 		foreach(str_split($wordset) as $letter){
 			if(substr_count($wordset, $letter) >= substr_count($word, $letter))
@@ -64,12 +65,12 @@
 	}
 	
 	if(isset($_COOKIE['ws']) & !isset($_POST["action"])) {
-		if(!validityhash($_COOKIE['ws'], $_COOKIE['gw'])  === $_COOKIE['hash']){
-			$errormsg = validityhash($_COOKIE['ws'], $_COOKIE['gw'])."<br>".$_COOKIE['ws'].$_COOKIE['gw'].$secret;
-			//return false;
+		if(validityhash($_COOKIE['ws'], $_COOKIE['gw'])  !== $_COOKIE['vh']){
+			echo "<h1>WRONG HASH: " . validityhash($_COOKIE['ws'], $_COOKIE['gw']) . "</h1>";
+			return false;
 		}
-		
-		$gw = $_COOKIE['gw'];
+
+		$gw = trim($_COOKIE['gw'],",");
 		$ws = $_COOKIE['ws'];
 		
     	$wordset = $_COOKIE['ws'];
@@ -99,7 +100,7 @@
 	setcookie("ws", $ws);
 	setcookie("gw", $gw);
 	
-	setcookie("hash", validityhash($ws, $gw));
+	setcookie("vh", validityhash($ws, $gw));
 ?>
 <html>
 	<head>
@@ -128,10 +129,10 @@
 				<input class="polygon_submit" style="width: 250;" type="text" name="word" autocomplete="off" maxlength="32" autofocus>
 				<input class="polygon_submit" style="width: 95;" type="submit" value="Go">
 			</form>
-			<div style="display: inline-block;">
-			<?php echo "<h3>".count(explode(',', $gw))." words</h3>"; ?>
+			<p style="display: inline-block;">
+			<?php echo "<h3 style=\"display: inline-block;\">" . count(explode(',', $gw)) . " " . (count(explode(',', $gw)) >= 1 ? "words" : "word") . "  </h3>"; ?>
 			<a href="polygon_reset.php">Reset</a>
-			</div>
+			</p>
 			<br>
 			<ul>
 				<?php
