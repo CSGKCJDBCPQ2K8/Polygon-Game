@@ -1,13 +1,12 @@
 <?php
 	$charset = "ABCDEFGHIJKLMNOPRSTUWY";
 	$vowelset = "AIUEO";
-	$wordset = "";
+	$ws = "";
 	$secret = "tNugBZkSGXttChnKX11hiULGFyhAZtBf";
-	$errormsg = "";
 	$pg = false;
 	
 	function checkword($word){
-		global $wordset, $guessedwords, $wordfile, $pg;
+		global $ws, $guessedwords, $pg;
 		
 		$word = strtoupper($word);
 		echo "[INPUT] (" . $word . ") <br>";
@@ -29,13 +28,13 @@
 		
 		echo "[PREV] " . implode(", ", $guessedwords) ."<br>";
 		
-		if(strpos($wordset[0], $word) === false)
-			return false;
-
-		echo "[PASS] contains base letter <br>";
+		if(strpos($ws[0], $word) === false)
+			echo "[ERROR] no base letter <br>";
+		else
+			echo "[PASS] contains base letter <br>";
 		
-		foreach(str_split($wordset) as $letter){
-			if(substr_count($wordset, $letter) >= substr_count($word, $letter))
+		foreach(str_split($ws) as $letter){
+			if(substr_count($ws, $letter) >= substr_count($word, $letter))
 				$word = str_replace($letter, "", $word);
 		}
 		echo "[???] remaining letters after filter (" . $word . ")<br>";
@@ -64,18 +63,20 @@
 		}
 	}
 	
-	if(isset($_COOKIE['ws']) & !isset($_POST["action"])) {
-		if(validityhash($_COOKIE['ws'], $_COOKIE['gw'])  !== $_COOKIE['vh']){
-			echo "<h1>WRONG HASH: " . validityhash($_COOKIE['ws'], $_COOKIE['gw']) . "</h1>";
+	if(isset($_COOKIE['ws']) & isset($_COOKIE['vh'])) {
+		if(isset($_COOKIE['gw']))
+			$gw = trim($_COOKIE['gw'],",");
+		else
+			$gw = "";
+
+		$ws = $_COOKIE['ws'];
+
+		if(validityhash($ws, $gw)  !== $_COOKIE['vh']){
+			echo "<h1>WRONG HASH: " . validityhash($ws, $gw) . "</h1>";
 			return false;
 		}
-
-		$gw = trim($_COOKIE['gw'],",");
-		$ws = $_COOKIE['ws'];
 		
-    	$wordset = $_COOKIE['ws'];
-		
-		$guessedwords = explode(',', $_COOKIE['gw']);
+		$guessedwords = explode(',', $gw);
 		
 		if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			if(checkword($_POST["word"])){
@@ -85,16 +86,13 @@
 		}
 	}
 	else{
-		$wordset = randchar(1);
+		$ws = randchar(1);
 		
 		for ($x = 0; $x <= 5; $x++) {
-			$wordset .= randchar();
+			$ws .= randchar();
 		}
 		
-		$ws = $wordset;
 		$gw = "";
-		
-		$ek = $wordset;
 	}
 	
 	setcookie("ws", $ws);
@@ -108,22 +106,19 @@
 	</head>
 	
 	<body>
-		<?php if($errormsg !== "")
-			echo "<h1>" . $errormsg . "</h1>";
-		?>
 		<div id="polygon_main">
 			<h1 id="polygon_game_title">Polygon</h1>
 
 			<div id="polygon_game_container">
 				<img  src="polygon_game_base.svg">
-				<p class="polygon_game_char" style="left: 150; top: 210; color: white;"><?php echo $wordset[0] ?></p>
+				<p class="polygon_game_char" style="left: 150; top: 210; color: white;"><?php echo $ws[0] ?></p>
 				
-				<p class="polygon_game_char" style="left: 150; top: 90;"><?php echo $wordset[1] ?></p>
-				<p class="polygon_game_char" style="right: 50; top: 150;"><?php echo $wordset[2] ?></p>
-				<p class="polygon_game_char" style="right: 50; top: 270;"><?php echo $wordset[3] ?></p>
-				<p class="polygon_game_char" style="left: 150; top: 330;"><?php echo $wordset[4] ?></p>
-				<p class="polygon_game_char" style="left: 45; top: 270;"><?php echo $wordset[5] ?></p>
-				<p class="polygon_game_char" style="left: 45; top: 150;"><?php echo $wordset[6] ?></p>
+				<p class="polygon_game_char" style="left: 150; top: 90;"><?php echo $ws[1] ?></p>
+				<p class="polygon_game_char" style="right: 50; top: 150;"><?php echo $ws[2] ?></p>
+				<p class="polygon_game_char" style="right: 50; top: 270;"><?php echo $ws[3] ?></p>
+				<p class="polygon_game_char" style="left: 150; top: 330;"><?php echo $ws[4] ?></p>
+				<p class="polygon_game_char" style="left: 45; top: 270;"><?php echo $ws[5] ?></p>
+				<p class="polygon_game_char" style="left: 45; top: 150;"><?php echo $ws[6] ?></p>
 			</div>
 			<form method="post">
 				<input class="polygon_submit" style="width: 250;" type="text" name="word" autocomplete="off" maxlength="32" autofocus>
