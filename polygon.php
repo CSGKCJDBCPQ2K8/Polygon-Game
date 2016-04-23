@@ -2,44 +2,48 @@
 	$charset = "ABCDEFGHIJKLMNOPRSTUWY";
 	$vowelset = "AIUEO";
 	$ws = "";
-	$secret = "tNugBZkSGXttChnKX11hiULGFyhAZtBf";
+	$secret = file_get_contents("data/secret");
 	$pg = false;
+	$message = "";
 	
 	function checkword($word){
-		global $ws, $guessedwords, $pg;
+		global $ws, $guessedwords, $pg, $message;
 		
 		$word = strtoupper($word);
-		echo "[INPUT] (" . $word . ") <br>";
 		
-		if(strlen($word) < 3)
+		if(strlen($word) < 3){
+			$message = "Is less than 3 letters long";
 			return false;
-		echo "[PASS] is greater than 3 letters <br>";
+		}
 		
-		if( strpos(file_get_contents("wordsEn.txt"),"\n".strtolower($word)."\r\n") !== false)
-			echo "[PASS] is a real word <br>";
-		else
+		if( strpos(file_get_contents("wordsEn.txt"),"\n".strtolower($word)."\r\n") === false){
+			$message = "Is not a real word";
 			return false;
+		}
 		
 		if(in_array(strtolower($word), $guessedwords)){
+			$message = "You have already got this word";
 			$pg = true;
 			return false;
 		}
-		echo "[PASS] is not previously guessed <br>";
-		
-		echo "[PREV] " . implode(", ", $guessedwords) ."<br>";
-		
-		if(strpos($ws[0], $word) === false)
-			echo "[ERROR] no base letter <br>";
-		else
-			echo "[PASS] contains base letter <br>";
-		
+
+		if(strpos(strtolower($word), strtolower($ws[0])) === false){
+			$message = "Middle letter is misssing";
+			return false;
+		}
+
 		foreach(str_split($ws) as $letter){
 			if(substr_count($ws, $letter) >= substr_count($word, $letter))
 				$word = str_replace($letter, "", $word);
 		}
-		echo "[???] remaining letters after filter (" . $word . ")<br>";
 		
-		return strlen($word) === 0;
+		if(strlen($word) === 0){
+			return true;
+		}
+		else{
+			$message = "Cant make this word from letters";
+			return false;
+		}
 	}
 	
 	function validityhash($c1, $c2){
@@ -81,7 +85,7 @@
 		if ($_SERVER["REQUEST_METHOD"] == "POST") {
 			if(checkword($_POST["word"])){
 				array_push ($guessedwords, $_POST["word"]);
-				$gw = implode (",", $guessedwords);
+				$gw = trim(implode (",", $guessedwords), ",");
 			}
 		}
 	}
@@ -99,6 +103,7 @@
 	setcookie("gw", $gw);
 	
 	setcookie("vh", validityhash($ws, $gw));
+	echo validityhash($ws, $gw)
 ?>
 <html>
 	<head>
@@ -120,23 +125,33 @@
 				<p class="polygon_game_char" style="left: 45; top: 270;"><?php echo $ws[5] ?></p>
 				<p class="polygon_game_char" style="left: 45; top: 150;"><?php echo $ws[6] ?></p>
 			</div>
+
 			<form method="post">
 				<input class="polygon_submit" style="width: 250;" type="text" name="word" autocomplete="off" maxlength="32" autofocus>
 				<input class="polygon_submit" style="width: 95;" type="submit" value="Go">
 			</form>
-			<p style="display: inline-block;">
-			<?php echo "<h3 style=\"display: inline-block;\">" . count(explode(',', $gw)) . " " . (count(explode(',', $gw)) >= 1 ? "words" : "word") . "  </h3>"; ?>
+
+			<?php
+				if($gw !== "")
+					echo "<h3 style=\"display: inline-block; margin: 5px;\">" .
+						count(explode(',', $gw)) . " " . (count(explode(',', $gw)) > 1 ? "words" : "word") ."  </h3>";
+			?>
 			<a href="polygon_reset.php">Reset</a>
-			</p>
+			<?php 
+				if($message !== "")
+					echo "<div id=\"polygon_messagebox\">" . $message . "</div>";
+			?>
+
 			<br>
 			<ul>
 				<?php
-					foreach(explode(',', $gw) as $word){
-						if($pg)
-							echo "<li ".($word == $_POST["word"] ? " id=\"polygon_previous_guess\" " : "")."> " . $word . " </li>";
-						else
-							echo "<li> " . $word . " </li>";
-					}
+					if($gw !== "")
+						foreach(explode(',', $gw) as $word){
+							if($pg)
+								echo "<li ".($word == $_POST["word"] ? " id=\"polygon_previous_guess\" " : "")."> " . $word . " </li>";
+							else
+								echo "<li> " . $word . " </li>";
+						}
 				?>
 			</ul> 
 		</div>
@@ -181,8 +196,16 @@
 			color: red;
 			font-weight: bold;
 		}
+		#polygon_messagebox {
+			font-weight: bold;
+			background-color: #ff9999;
+			border-style: solid;
+			margin: 10px;
+			padding: 5px;
+		}
 		ul {
 			font: 20px arial, serif;
+			margin: 10px;
 		}
 	</style>
 </html>
