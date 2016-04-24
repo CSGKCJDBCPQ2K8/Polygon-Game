@@ -90,12 +90,15 @@
 		}
 	}
 	else{
-		$ws = randchar(1);
-		
-		for ($x = 0; $x <= 5; $x++) {
-			$ws .= randchar();
+		if(isset($_GET["wordset"]))
+			$ws = strtoupper($_GET["wordset"]);
+		else{
+			$ws = randchar(1);
+			
+			for ($x = 0; $x <= 5; $x++) {
+				$ws .= randchar();
+			}
 		}
-		
 		$gw = "";
 	}
 	
