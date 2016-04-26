@@ -44,7 +44,8 @@
 	setcookie("gw", $gw);
 	
 	setcookie("vh", validityhash($ws, $gw));
-	echo validityhash($ws, $gw)
+	if(isset($_GET["showhash"])
+		echo validityhash($ws, $gw);
 ?>
 <html>
 	<head>
