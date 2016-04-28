@@ -31,11 +31,11 @@
 		if(isset($_GET["wordset"]))
 			$ws = strtoupper($_GET["wordset"]);
 		else{
-			$ws = randchar(1);
+			$ws = 'ODMISKT'; //randchar(1);
 			
-			for ($x = 0; $x <= 5; $x++) {
-				$ws .= randchar();
-			}
+			//for ($x = 0; $x <= 5; $x++) {
+			//	$ws .= randchar();
+			//}
 		}
 		$gw = "";
 	}
@@ -44,7 +44,7 @@
 	setcookie("gw", $gw);
 	
 	setcookie("vh", validityhash($ws, $gw));
-	if(isset($_GET["showhash"])
+	if(isset($_GET["showhash"]))
 		echo validityhash($ws, $gw);
 ?>
 <html>
@@ -96,7 +96,9 @@
 						}
 				?>
 			</ul> 
-		</div>
+		</div id="polygon_scoreboard">
+			<iframe src="polygon_scores.php"></iframe>
+		<div>
 	</body>
 	
 	<style>
@@ -148,6 +150,17 @@
 		ul {
 			font: 20px arial, serif;
 			margin: 10px;
+		}
+		#polygon_scoreboard {
+			width: 200;
+			height: 95%;
+			position: absolute;
+			right: 50%;
+			padding: 5;
+			top: 1.25%;
+			border: solid;
+			overflow: auto;
+			overflow-x: hidden;
 		}
 	</style>
 </html>
