@@ -50,6 +50,7 @@
 <html>
 	<head>
 		<title>Polygon</title>
+		<script type="text/javascript" src="polygon_optional.js"></script>
 	</head>
 	
 	<body>
@@ -78,7 +79,9 @@
 					echo "<h3 style=\"display: inline-block; margin: 5px;\">" .
 						count(explode(',', $gw)) . " " . (count(explode(',', $gw)) > 1 ? "words" : "word") ."  </h3>";
 			?>
-			<a href="polygon_reset.php">Reset</a>
+			<a href="polygon_reset.php">Reset.</a>
+			<br>
+			<a href="polygon_scores.php">View Scores.</a>
 			<?php 
 				if($message !== "")
 					echo "<div id=\"polygon_messagebox\">" . $message . "</div>";
@@ -96,9 +99,7 @@
 						}
 				?>
 			</ul> 
-		</div id="polygon_scoreboard">
-			<iframe src="polygon_scores.php"></iframe>
-		<div>
+		</div>
 	</body>
 	
 	<style>
@@ -111,14 +112,32 @@
 			padding: 5;
 			top: 1.25%;
 			border: solid;
-			overflow: auto;
-			overflow-x: hidden;
+			_overflow: auto;
+			_overflow: hidden;
 		}
 		#polygon_game_title {
 			width: 100%;
 			text-align: center;
 			font: 50px arial, serif;
 			margin: 5 0 10 0;
+		}
+		#polygon_score_toggle {
+			position: absolute;
+			float: left;
+			left: 50%;
+			top: 527px;
+			z-index: 1000;
+		}
+		#polygon_scorebox {
+			visibility: hidden;
+		}
+		#polygon_score_toggle:checked ~ #polygon_scorebox {
+			position: absolute;
+			left: 10%;
+			top: 1.25%;
+			border: solid;
+			overflow: auto;
+			visibility: visible;
 		}
 		.polygon_game_char {
 			position: absolute;
@@ -150,17 +169,6 @@
 		ul {
 			font: 20px arial, serif;
 			margin: 10px;
-		}
-		#polygon_scoreboard {
-			width: 200;
-			height: 95%;
-			position: absolute;
-			right: 50%;
-			padding: 5;
-			top: 1.25%;
-			border: solid;
-			overflow: auto;
-			overflow-x: hidden;
 		}
 	</style>
 </html>
