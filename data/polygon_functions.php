@@ -6,7 +6,7 @@
 	
 	function checkword($word){
 		global $ws, $guessedwords, $pg, $message;
-		
+
 		$word = strtoupper($word);
 		
 		if(strlen($word) < 3){
@@ -14,18 +14,18 @@
 			return false;
 		}
 		
-		if( strpos(file_get_contents("wordsEn.txt"),"\n".strtolower($word)."\r\n") === false){
+		if( strpos(file_get_contents("data/wordsEn.txt"),"\n".strtoupper($word)."\r\n") === false){
 			$message = "Is not a real word";
 			return false;
 		}
 		
-		if(in_array(strtolower($word), $guessedwords)){
+		if(in_array(strtoupper($word), $guessedwords)){
 			$message = "You have already got this word";
 			$pg = true;
 			return false;
 		}
 
-		if(strpos(strtolower($word), strtolower($ws[0])) === false){
+		if(strpos(strtoupper($word), strtoupper($ws[0])) === false){
 			$message = "Middle letter is misssing";
 			return false;
 		}
